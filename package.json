@@ -1,0 +1,1 @@
+{"name":"cribl_qualys_detections","version":"1.0.1","minLogStreamVersion":"4.0.0","author":"Jon Rust - Cribl","description":"Process output of scripted collector for Qualys detection events","displayName":"Qualys Detections","tags":{"streamtags":[],"dataType":["logs"],"useCase":["reduction"]}}

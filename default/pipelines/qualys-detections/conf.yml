@@ -1,0 +1,112 @@
+output: default
+streamtags: []
+groups:
+  exZs3P:
+    name: Prep for Splunk delivery
+    disabled: true
+    index: 6
+asyncFuncTimeout: 1000
+functions:
+  - id: comment
+    filter: "true"
+    disabled: null
+    conf:
+      comment: >-
+        Version: 1.0.0
+
+        Author: Jon Rust <jon@cribl.io>
+
+        Purpose: A demonstration of using a scripted collector to ingest logs from Qualys
+
+
+        The data resulting from the API and the EB will be parsed into JSON, 1 event per detection. I've provided a simple conversion to turn the JSON back into a string in _raw, suitable for Splunk. 
+
+
+        See the README for more info
+  - id: drop
+    filter: _raw.startsWith("<?xml version")
+    disabled: null
+    conf: {}
+  - id: eval
+    filter: "true"
+    disabled: null
+    conf:
+      add:
+        - disabled: false
+          name: _raw
+          value: C.Text.parseXml(_raw)
+        - disabled: false
+          name: data
+          value: _raw.HOST
+        - disabled: false
+          name: list
+          value: data.DETECTION_LIST.DETECTION
+        - disabled: false
+          name: _raw
+          value: undefined
+        - disabled: false
+          name: data.DETECTION_LIST
+          value: undefined
+      remove:
+        - source
+  - id: unroll
+    filter: "true"
+    disabled: false
+    conf:
+      srcExpr: list
+      dstField: data.detection
+  - id: eval
+    filter: "true"
+    disabled: null
+    conf:
+      remove:
+        - list
+        - test_type
+  - id: comment
+    filter: "true"
+    disabled: null
+    conf:
+      comment: Enable this if you're sending to Splunk
+  - id: serialize
+    filter: "true"
+    disabled: true
+    conf:
+      type: json
+      dstField: _raw
+      fields:
+        - "*"
+      srcField: data
+    groupId: exZs3P
+  - id: eval
+    filter: "true"
+    disabled: true
+    conf:
+      remove:
+        - data
+      add:
+        - disabled: false
+          name: index
+          value: "'qualys'"
+        - disabled: false
+          name: source
+          value: "'qualys'"
+        - disabled: false
+          name: sourcetype
+          value: "'qualys:api'"
+    groupId: exZs3P
+  - id: comment
+    filter: "true"
+    disabled: null
+    conf:
+      comment: Or move everything in data up to the top level of the event, suitable
+        for Elastic and other tools
+  - id: eval
+    filter: "true"
+    disabled: null
+    conf:
+      add:
+        - disabled: false
+          value: Object.assign(__e,data)
+          name: ""
+      remove:
+        - data
