@@ -1,0 +1,20 @@
+msentra_default_splunk_index:
+  type: any
+  lib: custom
+  value: "'msentra'"
+enable_filter_conditional_access_policies:
+  type: boolean
+  lib: custom
+  value: "true"
+  description: Should the Conditional Access Policies array be filtered of all
+    entries that were not applied?
+enable_sample_graph_activity:
+  type: boolean
+  lib: custom
+  value: "true"
+  description: Should status=200 MS Graph Activity data be sampled?
+enable_move_properties_array:
+  type: boolean
+  lib: custom
+  value: "false"
+  description: 'EXPERIMENTAL: Should the "properties" array contents be moved into the main event body?'

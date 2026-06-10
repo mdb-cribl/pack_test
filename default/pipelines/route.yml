@@ -1,0 +1,25 @@
+id: default
+groups: {}
+comments: []
+routes:
+  - id: Gg6avV
+    name: cribl_route_msentra_activity_data
+    final: true
+    disabled: false
+    pipeline: cribl_ms_entraid_activity
+    description: ""
+    enableOutputExpression: false
+    targetContext: group
+    filter: __packsource.includes('cribl-ms-entraid-io')
+    clones: []
+    output: __group
+  - id: default
+    name: default
+    final: true
+    disabled: false
+    pipeline: main
+    description: ""
+    enableOutputExpression: false
+    filter: "true"
+    clones: []
+    output: default

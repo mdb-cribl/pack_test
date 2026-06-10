@@ -1,0 +1,90 @@
+output: default
+streamtags: []
+groups:
+  jaAZWg:
+    name: Reduction
+    index: 2
+  1NNAst:
+    name: Output to Splunk/Cribl Lake
+    disabled: false
+    index: 3
+asyncFuncTimeout: 1000
+functions:
+  - id: comment
+    filter: "true"
+    conf:
+      comment: "Parse, perform minor cleanup, and call (optional) reduction pipelines. "
+  - id: comment
+    filter: "true"
+    conf:
+      comment: "Author: Cribl Packs Team"
+  - id: comment
+    filter: "true"
+    conf:
+      comment: Call optional reduction pipelines - set variables to enable/disable.
+    groupId: jaAZWg
+  - id: chain
+    filter: category.includes('SignIn') &&
+      C.vars['enable_filter_conditional_access_policies']
+    conf:
+      processor: cribl_ms_entraid_signin_reduction
+    groupId: jaAZWg
+    description: Filter the Conditional Access Policies array
+  - id: chain
+    filter: category == 'MicrosoftGraphActivityLogs' &&
+      C.vars['enable_sample_graph_activity']
+    conf:
+      processor: cribl_ms_entraid_graph_activity_reduction
+    groupId: jaAZWg
+    description: Sample the Graph Activity API events
+  - id: chain
+    filter: C.vars['enable_move_properties_array']
+    disabled: false
+    conf:
+      processor: cribl_ms_entraid_move_properties_array
+    groupId: jaAZWg
+    description: 'EXPERIMENTAL: Only enable if using Cribl Search. Move the
+      "properties" array entries into the main event body.'
+  - id: serialize
+    filter: "true"
+    disabled: false
+    conf:
+      type: json
+      dstField: _raw
+      fields:
+        - "!cribl_*"
+        - "!host"
+        - "!source"
+        - "!sourcetype"
+        - "!category"
+        - "!index"
+        - "!_*"
+        - "*"
+    groupId: 1NNAst
+  - id: eval
+    filter: "true"
+    disabled: false
+    conf:
+      keep:
+        - _*
+        - cribl_*
+        - host
+        - source
+        - sourcetype
+        - index
+        - category
+      remove:
+        - "*"
+        - _*
+      add:
+        - disabled: false
+          name: index
+          value: index || C.vars['msentra_default_splunk_index']
+        - disabled: false
+          name: sourcetype
+          value: "'azure:monitor:aad'"
+        - disabled: false
+          name: source
+          value: "'ms_entraid_activity_eventhub'"
+    groupId: 1NNAst
+description: ""

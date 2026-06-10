@@ -1,0 +1,12 @@
+mMG2SM:
+  sampleName: cribl_ms_entraid_signin
+  created: 1773791161236
+  isPackOnly: true
+  size: 29732
+  numEvents: 3
+akiCg8:
+  sampleName: cribl_ms_entraid_graph_activity
+  created: 1773873780494
+  isPackOnly: true
+  size: 34154
+  numEvents: 5

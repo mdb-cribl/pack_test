@@ -1,0 +1,43 @@
+output: default
+streamtags: []
+groups: {}
+asyncFuncTimeout: 1000
+functions:
+  - id: comment
+    filter: "true"
+    conf:
+      comment: Reduce MS Graph API Activity Logs by sampling. These tend to be *very*
+        verbose, so it makes sense to only send a representative sample. If you
+        need metrics than use a separate pipeline (not included).
+  - id: comment
+    filter: "true"
+    conf:
+      comment: "Author: Cribl Packs Team"
+  - id: comment
+    filter: "true"
+    conf:
+      comment: Sample status=200 events - adjust based on your Graph API activity level
+  - id: sampling
+    filter: category == 'MicrosoftGraphActivityLogs' &&
+      properties.responseStatusCode == 200
+    disabled: false
+    conf:
+      rules:
+        - filter: properties.responseStatusCode == 200
+          rate: 250
+  - id: comment
+    filter: "true"
+    conf:
+      comment: Dynamically sample status!=200 events based on a combination of status
+        and user agent
+  - id: dynamic_sampling
+    filter: category == 'MicrosoftGraphActivityLogs' &&
+      properties.responseStatusCode != 200
+    disabled: false
+    conf:
+      mode: log
+      keyExpr: "`${properties.userAgent}::${properties.responseStatusCode}`"
+      samplePeriod: 30
+      minEvents: 30
+      maxSampleRate: 100
+description: ""

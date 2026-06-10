@@ -1,0 +1,1 @@
+{"name":"cribl-microsoft-entraid-io","version":"1.0.0","minLogStreamVersion":"4.17.0","author":"Cribl Packs Team","description":"Pack to collect and process Microsoft Entra ID activity data","displayName":"Cribl Microsoft Entra ID IO","tags":{"streamtags":["MSEntra","EventHub"],"dataType":["logs"]},"exports":[]}

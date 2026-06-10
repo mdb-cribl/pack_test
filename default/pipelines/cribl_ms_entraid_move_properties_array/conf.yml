@@ -1,0 +1,45 @@
+output: default
+streamtags: []
+groups: {}
+asyncFuncTimeout: 1000
+functions:
+  - id: comment
+    filter: "true"
+    conf:
+      comment: Copy the contents of the "properties" array into the main event. This
+        makes searching with certain platforms like Cribl Search simpler.
+  - id: comment
+    filter: "true"
+    conf:
+      comment: "Author: Cribl Packs Team"
+  - id: comment
+    filter: "true"
+    conf:
+      comment: DO NOT ENABLE if sending data to Splunk (or most other SIEMs) - it will
+        break their parsing!
+  - id: code
+    filter: properties
+    conf:
+      maxNumOfIterations: 5000
+      activeLogSampleRate: 1
+      useUniqueLogChannel: true
+      code: "try {\r
+
+        // Copy all keys from properties into the main JSON body\r
+
+        \   let properties = Object.entries(__e.properties);\r
+
+        \   for (let [key, value] of properties) {\r
+
+        \         __e[key] = value;\r
+
+        \   }\r
+
+        \   delete __e['properties'];\r
+
+        } catch (error) {\r
+
+        \  __e['cribl_code_error'] = String(error);\r
+
+        }"
+description: ""

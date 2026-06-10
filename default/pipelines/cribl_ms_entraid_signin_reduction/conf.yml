@@ -1,0 +1,60 @@
+output: default
+streamtags: []
+groups: {}
+asyncFuncTimeout: 1000
+functions:
+  - id: comment
+    filter: "true"
+    conf:
+      comment: Reduce the size of Signin Logs
+  - id: comment
+    filter: "true"
+    conf:
+      comment: "Author: Cribl Packs Team"
+  - id: comment
+    filter: "true"
+    conf:
+      comment: 'Remove entries in the appliedConditionalAccessPolicies array that
+        convey no information e.g. "notApplied". This will - in general -
+        significantly reduce the overall size of each event. '
+  - id: comment
+    filter: "true"
+    conf:
+      comment: To tune - edit the "keepResults" array in the Code Function below to
+        remove/add "policyItem.result" values you wish to keep.
+  - id: code
+    filter: properties.appliedConditionalAccessPolicies
+    conf:
+      maxNumOfIterations: 5000
+      activeLogSampleRate: 1
+      useUniqueLogChannel: true
+      code: "try {\r
+
+        \    // List of appliedConditionalAccessPolicies results to keep\r
+
+        \    const keepResults = ['success', 'failure', 'reportOnlyFailure',
+        'reportOnlySuccess'];\r
+
+        \   \r
+
+        \   // Add a field for total # of policies\r
+
+        \    __e.properties.appliedConditionalAccessPoliciesNum =
+        (__e.properties.appliedConditionalAccessPolicies.length).toString();\r
+
+        \r
+
+        \    // Filter out unneeded appliedConditionalAccessPolicies entries\r
+
+        \    __e.properties.appliedConditionalAccessPolicies =
+        __e.properties.appliedConditionalAccessPolicies.filter(policyItem =>
+        keepResults.includes(policyItem.result));\r
+
+        \  \r
+
+        } catch (err) {\r
+
+        \  __e.CRIBLERR = String(err);\r
+
+        }"
+description: ""

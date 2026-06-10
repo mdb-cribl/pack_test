@@ -1,0 +1,47 @@
+inputs:
+  in_msentra_activity_logs:
+    disabled: true
+    sendToRoutes: true
+    pqEnabled: false
+    streamtags: []
+    brokers:
+      - YOUR_BROKER.servicebus.windows.net
+    topics:
+      - YOUR_TOPIC
+    groupId: Cribl
+    fromBeginning: true
+    connectionTimeout: 10000
+    requestTimeout: 60000
+    maxRetries: 5
+    maxBackOff: 30000
+    initialBackoff: 300
+    backoffRate: 2
+    authenticationTimeout: 10000
+    reauthenticationThreshold: 10000
+    sasl:
+      disabled: false
+      mechanism: oauthbearer
+      oauthEndpoint: https://login.microsoftonline.com
+      clientSecretAuthType: manual
+      authType: secret
+      username: $ConnectionString
+      password: YOUR_CONNECTION_STRING_KEY
+      scope: https://YOUR_SCOPE.servicebus.windows.net/.default
+      clientId: YOUR_CLIENT_ID
+      tenantId: YOUR_TENANT_ID
+      clientSecret: YOUR_CLIENT_SECRET
+    tls:
+      disabled: false
+      rejectUnauthorized: false
+    sessionTimeout: 30000
+    rebalanceTimeout: 60000
+    heartbeatInterval: 3000
+    maxBytesPerPartition: 1048576
+    maxBytes: 10485760
+    maxSocketErrors: 0
+    minimizeDuplicates: false
+    type: eventhub
+    metadata:
+      - name: __packsource
+        value: "'cribl-ms-entraid-io'"
+    pipeline: _cribl_ms_entraid_preprocess

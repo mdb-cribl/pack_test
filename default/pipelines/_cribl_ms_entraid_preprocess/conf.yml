@@ -1,0 +1,126 @@
+output: default
+streamtags: []
+groups:
+  P8h788:
+    name: Timestamping
+    index: 6
+asyncFuncTimeout: 1000
+functions:
+  - id: comment
+    filter: "true"
+    conf:
+      comment: Unroll and timestamp common data from MS EventHubs. Intended as a
+        pre-processing pipeline!
+  - id: comment
+    filter: "true"
+    conf:
+      comment: "Author: Cribl Packs Team"
+  - id: comment
+    filter: "true"
+    conf:
+      comment: Unroll the "records" array into separate events - this is required
+        because Event Hub Sources do not support Event Breakers.
+  - id: unroll
+    filter: "true"
+    conf:
+      srcExpr: records
+      dstField: _raw
+  - id: serde
+    filter: "true"
+    conf:
+      mode: extract
+      type: json
+      srcField: _raw
+      fieldFilterExpr: value !== '' && value !== null
+      remove:
+        - _raw
+    description: Parse _raw to JSON
+  - id: eval
+    filter: "true"
+    conf:
+      remove:
+        - records
+        - cribl_breaker
+        - _raw
+        - _time
+      add: []
+  - id: comment
+    filter: "true"
+    conf:
+      comment: |-
+        Look for the fields for the timestamp - the following should cover the most common EventHub sources:
+        * Entra Diagnostic Logs e.g. Sign-ins
+        * MS Graph Activity
+        * MS Defender
+    groupId: P8h788
+  - id: auto_timestamp
+    filter: properties.createdDateTime
+    conf:
+      srcField: properties.createdDateTime
+      dstField: _time
+      defaultTimezone: local
+      timeExpression: time.getTime() / 1000
+      offset: 0
+      maxLen: 150
+      defaultTime: now
+      latestDateAllowed: +1week
+      earliestDateAllowed: -420weeks
+    description: Common for MS Entra Diagnostic data
+    groupId: P8h788
+  - id: auto_timestamp
+    filter: properties.timeGenerated
+    conf:
+      srcField: properties.timeGenerated
+      dstField: _time
+      defaultTimezone: local
+      timeExpression: time.getTime() / 1000
+      offset: 0
+      maxLen: 150
+      defaultTime: now
+      latestDateAllowed: +1week
+      earliestDateAllowed: -420weeks
+    description: MS Graph Activity logs
+    groupId: P8h788
+  - id: auto_timestamp
+    filter: properties.Timestamp
+    conf:
+      srcField: properties.Timestamp
+      dstField: _time
+      defaultTimezone: local
+      timeExpression: time.getTime() / 1000
+      offset: 0
+      maxLen: 150
+      defaultTime: now
+      latestDateAllowed: +1week
+      earliestDateAllowed: -420weeks
+    description: MS Defender logs
+    groupId: P8h788
+  - id: auto_timestamp
+    filter: properties.activityDateTime
+    conf:
+      srcField: properties.activityDateTime
+      dstField: _time
+      defaultTimezone: local
+      timeExpression: time.getTime() / 1000
+      offset: 0
+      maxLen: 150
+      defaultTime: now
+      latestDateAllowed: +1week
+      earliestDateAllowed: -420weeks
+    groupId: P8h788
+    description: Audit logs, Provisioning Logs
+  - id: auto_timestamp
+    filter: properties.riskLastUpdatedDateTime
+    conf:
+      srcField: properties.riskLastUpdatedDateTime
+      dstField: _time
+      defaultTimezone: local
+      timeExpression: time.getTime() / 1000
+      offset: 0
+      maxLen: 150
+      defaultTime: now
+      latestDateAllowed: +1week
+      earliestDateAllowed: -420weeks
+    groupId: P8h788
+    description: Risky Users
+description: ""
